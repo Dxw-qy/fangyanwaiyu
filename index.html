@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+ <html lang="zh-CN">
+ <head>
+     <meta charset="UTF-8">
+     <title>方言外语互通词典</title>
+ </head>
+ <body>
+     <h2>方言↔外语查询</h2>
+     <input type="text" id="searchInput" placeholder="输入方言或者英文查询">
+     <button onclick="searchWord()">搜索</button>
+     <div id="result"></div>
+     <script>
+         let wordList = [];
+         //读取csv文件
+         fetch('dialect.csv')
+         .then(res=>res.text())
+         .then(csvText=>{
+             const lines = csvText.split("\n");
+             for(let i=1; i<lines.length;i++){
+                 const item = lines[i].split(",");
+                 wordList.push({
+                     word:item[0],
+                     phonetic:item[1],
+                     en:item[2],
+                     sentence:item[3]
+                 })
+             }
+         })
+         function searchWord(){
+             const key = document.getElementById("searchInput").value.trim();
+             const find = wordList.find(x=>x.word===key || x.en===key);
+           if(find){
+                 document.getElementById("result").innerText=`方言：${find.word}｜音标：${find.phonetic}｜英文：${find.en}｜例句：${find.sentence}`
+             }else{
+                 document.getElementById("result").innerText="没有找到该词条"
+             }
+         }
+     </script>
+ </body>
+ </html>
