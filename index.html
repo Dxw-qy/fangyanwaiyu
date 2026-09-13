@@ -1,40 +1,38 @@
-<!DOCTYPE html>
- <html lang="zh-CN">
- <head>
-     <meta charset="UTF-8">
-     <title>方言外语互通词典</title>
- </head>
- <body>
-     <h2>方言↔外语查询</h2>
-     <input type="text" id="searchInput" placeholder="输入方言或者英文查询">
-     <button onclick="searchWord()">搜索</button>
-     <div id="result"></div>
-     <script>
-         let wordList = [];
-         //读取csv文件
-         fetch('dialect.csv')
-         .then(res=>res.text())
-         .then(csvText=>{
-             const lines = csvText.split("\n");
-             for(let i=1; i<lines.length;i++){
-                 const item = lines[i].split(",");
-                 wordList.push({
-                     word:item[0],
-                     phonetic:item[1],
-                     en:item[2],
-                     sentence:item[3]
-                 })
-             }
-         })
-         function searchWord(){
-             const key = document.getElementById("searchInput").value.trim();
-             const find = wordList.find(x=>x.word===key || x.en===key);
-           if(find){
-                 document.getElementById("result").innerText=`方言：${find.word}｜音标：${find.phonetic}｜英文：${find.en}｜例句：${find.sentence}`
-             }else{
-                 document.getElementById("result").innerText="没有找到该词条"
-             }
-         }
-     </script>
- </body>
- </html>
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>方言与外语互通翻译 — 示例</title>
+  <style>
+    body { font-family: system-ui, Arial; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+    textarea { width:100%; height:120px; }
+    select, button { margin: 0 .5rem 1rem 0; }
+    pre { background:#f7f7f7; padding:1rem; white-space:pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>方言与外语互通翻译（示例）</h1>
+  <label>文本：</label>
+  <textarea id="input" placeholder="输入要翻译的文本"></textarea>
+  <div>
+    <label>从：</label>
+    <select id="from">
+      <option value="cmn">普通话</option>
+      <option value="yue">粤语</option>
+      <option value="en">English</option>
+    </select>
+    <label>到：</label>
+    <select id="to">
+      <option value="cmn">普通话</option>
+      <option value="yue">粤语</option>
+      <option value="en">English</option>
+    </select>
+    <button id="translate">翻译</button>
+  </div>
+  <h3>结果：</h3>
+  <pre id="output">（等待翻译）</pre>
+
+  <script src="script.js"></script>
+</body>
+</html>
