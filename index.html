@@ -1,11 +1,81 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>方言外语网站</title>
-</head>
-<body>
-    <h1>方言外语网站</h1>
-    <p>欢迎来到方言外语项目！</p >
-</body>
-</html>
+html lang="zh-CN">
+ <head>
+     <meta charset="UTF-8">
+     <title>方言外语网站</title>
+     <style>
+         *{
+             margin: 0;
+             padding: 0;
+             box-sizing: border-box;
+         }
+         body{
+             background-color: #f0f6ff;
+             font-family: "Microsoft Yahei", sans-serif;
+             padding: 60px 80px;
+         }
+         h1{
+             color: #2c4b82;
+             font-size:42px;
+             margin-bottom:30px;
+         }
+         .box{
+             background:white;
+             padding:30px;
+             border-radius:12px;
+             box-shadow: 0 2px 10px #ccd8e8;
+             max-width:600px;
+         }
+         input{
+             width:70%;
+             padding:10px;
+             font-size:18px;
+             border:1px solid #99b3d8;
+             border-radius:6px;
+         }
+         button{
+             padding:10px 20px;
+             font-size:18px;
+             background:#2c4b82;
+             color:white;
+             border:none;
+             border-radius:6px;
+             cursor:pointer;
+             margin-left:8px;
+         }
+         #result{
+             margin-top:25px;
+             font-size:20px;
+             color:#333;
+         }
+     </style>
+ </head>
+ <body>
+     <h1>方言外语网站</h1>
+     <div class="box">
+         <p>输入方言词汇查询释义：</p >
+         <br>
+         <input id="wordInput" placeholder="请输入方言词">
+         <button onclick="searchWord()">查询</button>
+         <div id="result"></div>
+     </div>
+ <script>
+ // 方言词汇库，你后面可以继续在这里增加更多词
+ const dict = {
+     "晓得":"知道",
+     "啥子":"什么",
+     "莫":"不要",
+     "咋个":"怎么",
+     "安逸":"舒服、满意"
+ };
+ function searchWord(){
+     const input = document.getElementById("wordInput").value.trim();
+     const resDom = document.getElementById("result");
+     if(dict[input]){
+         resDom.innerText = `释义：${dict[input]}`;
+     }else{
+         resDom.innerText = "暂无该词汇";
+     }
+ }
+ </script>
+ </body>
+ </html>
