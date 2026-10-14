@@ -1,80 +1,84 @@
 html lang="zh-CN">
  <head>
      <meta charset="UTF-8">
-     <title>方言外语网站</title>
+     <title>方言外语词典</title>
      <style>
-         *{
-             margin: 0;
-             padding: 0;
-             box-sizing: border-box;
-         }
+         *{ margin:0; padding:0; box-sizing:border-box; }
          body{
-             background-color: #f0f6ff;
-             font-family: "Microsoft Yahei", sans-serif;
-             padding: 60px 80px;
+             background:#f0f6ff;
+             font-family:"Microsoft Yahei",sans-serif;
+             padding:40px 60px;
          }
-         h1{
-             color: #2c4b82;
-             font-size:42px;
-             margin-bottom:30px;
-         }
+         h1{ color:#2c4b82; font-size:38px; margin-bottom:20px; }
          .box{
-             background:white;
-             padding:30px;
-             border-radius:12px;
-             box-shadow: 0 2px 10px #ccd8e8;
-             max-width:600px;
+             background:white; padding:25px; border-radius:12px;
+             box-shadow:0 2px 10px #ccd8e8; max-width:600px; margin-bottom:20px;
          }
          input{
-             width:70%;
-             padding:10px;
-             font-size:18px;
-             border:1px solid #99b3d8;
-             border-radius:6px;
+             width:70%; padding:10px; font-size:17px;
+             border:1px solid #99b3d8; border-radius:6px;
          }
          button{
-             padding:10px 20px;
-             font-size:18px;
-             background:#2c4b82;
-             color:white;
-             border:none;
-             border-radius:6px;
-             cursor:pointer;
-             margin-left:8px;
+             padding:10px 20px; font-size:17px; background:#2c4b82;
+             color:white; border:none; border-radius:6px; cursor:pointer;
          }
-         #result{
-             margin-top:25px;
-             font-size:20px;
-             color:#333;
-         }
+         #result{ margin-top:18px; font-size:19px; color:#333; }
+         #count{ color:#888; font-size:14px; margin-top:8px; }
+         table{ border-collapse:collapse; width:100%; background:white; }
+         th,td{ border:1px solid #cfe0f5; padding:8px 12px; text-align:left; }
+         th{ background:#2c4b82; color:white; }
+         tr:nth-child(even){ background:#f3f8ff; }
      </style>
  </head>
  <body>
-     <h1>方言外语网站</h1>
+     <h1>方言外语词典</h1>
      <div class="box">
-         <p>输入方言词汇查询释义：</p >
-         <br>
-         <input id="wordInput" placeholder="请输入方言词">
+         <input id="wordInput" placeholder="输入方言词查询">
          <button onclick="searchWord()">查询</button>
          <div id="result"></div>
      </div>
+     <div id="count">正在加载词表...</div>
+     <table id="dictTable"></table>
  <script>
- // 方言词汇库，你后面可以继续在这里增加更多词
- const dict = {
-     "晓得":"知道",
-     "啥子":"什么",
-     "莫":"不要",
-     "咋个":"怎么",
-     "安逸":"舒服、满意"
- };
+ let dict = {};   // 词: 释义
+ let words = [];  // 完整词条
+ // 从同目录 dialect.csv 导入，格式：方言词,释义（每行一条）
+ fetch('dialect.csv')
+     .then(r => r.text())
+     .then(text => {
+         const lines = text.split('\n').filter(l => l.trim() !== '');
+         // 跳过表头（如果第一行是"方言,释义"这种标题）
+         const start = lines[0].includes('方言') ? 1 : 0;
+         for(let i=start; i<lines.length; i++){
+             const parts = lines[i].split(',');
+             if(parts.length >= 2){
+                 const w = parts[0].trim();
+                 const m = parts.slice(1).join(',').trim();
+                 dict[w] = m;
+                 words.push({word:w, mean:m});
+             }
+         }
+         document.getElementById('count').innerText =
+             `已导入 ${words.length} 个词汇`;
+         renderTable(words);
+     })
+     .catch(err => {
+         document.getElementById('count').innerText =
+             '导入失败：请确认 dialect.csv 已上传到仓库（' + err + '）';
+     });
  function searchWord(){
-     const input = document.getElementById("wordInput").value.trim();
-     const resDom = document.getElementById("result");
+     const input = document.getElementById('wordInput').value.trim();
+     const res = document.getElementById('result');
      if(dict[input]){
-         resDom.innerText = `释义：${dict[input]}`;
+         res.innerText = `${input}：${dict[input]}`;
      }else{
-         resDom.innerText = "暂无该词汇";
+         res.innerText = '暂无该词汇';
      }
+ }
+ function renderTable(data){
+     const tb = document.getElementById('dictTable');
+     tb.innerHTML = `<tr><th>方言词</th><th>释义</th></tr>` +
+         data.map(d => `<tr><td>${d.word}</td><td>${d.mean}</td></tr>`).join('');
  }
  </script>
  </body>
