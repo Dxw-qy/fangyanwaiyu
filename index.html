@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 html lang="zh-CN">
  <head>
      <meta charset="UTF-8">
@@ -12,7 +13,7 @@ html lang="zh-CN">
          h1{ color:#2c4b82; font-size:38px; margin-bottom:20px; }
          .box{
              background:white; padding:25px; border-radius:12px;
-             box-shadow:0 2px 10px #ccd8e8; max-width:600px; margin-bottom:20px;
+             box-shadow:0 2px 10px #ccd8e8; max-width:700px; margin-bottom:20px;
          }
          input{
              width:70%; padding:10px; font-size:17px;
@@ -25,60 +26,67 @@ html lang="zh-CN">
          #result{ margin-top:18px; font-size:19px; color:#333; }
          #count{ color:#888; font-size:14px; margin-top:8px; }
          table{ border-collapse:collapse; width:100%; background:white; }
-         th,td{ border:1px solid #cfe0f5; padding:8px 12px; text-align:left; }
+         th,td{ border:1px solid #cfe0f5; padding:8px 10px; text-align:left; }
          th{ background:#2c4b82; color:white; }
          tr:nth-child(even){ background:#f3f8ff; }
      </style>
  </head>
  <body>
-     <h1>方言外语词典</h1>
+     <h1>方言转英文翻译</h1>
      <div class="box">
-         <input id="wordInput" placeholder="输入方言词查询">
-         <button onclick="searchWord()">查询</button>
+         <input id="wordInput" placeholder="输入方言词，翻译成英文">
+         <button onclick="searchWord()">翻译</button>
          <div id="result"></div>
      </div>
      <div id="count">正在加载词表...</div>
      <table id="dictTable"></table>
  <script>
- let dict = {};   // 词: 释义
- let words = [];  // 完整词条
- // 从同目录 dialect.csv 导入，格式：方言词,释义（每行一条）
+ let dict = {};
+ let words = [];
  fetch('dialect.csv')
      .then(r => r.text())
      .then(text => {
          const lines = text.split('\n').filter(l => l.trim() !== '');
-         // 跳过表头（如果第一行是"方言,释义"这种标题）
-         const start = lines[0].includes('方言') ? 1 : 0;
-         for(let i=start; i<lines.length; i++){
+         //跳过表头
+         for(let i=1; i<lines.length; i++){
              const parts = lines[i].split(',');
-             if(parts.length >= 2){
-                 const w = parts[0].trim();
-                 const m = parts.slice(1).join(',').trim();
-                 dict[w] = m;
-                 words.push({word:w, mean:m});
+             if(parts.length >=4){
+                 const word = parts[0].trim();
+                 const phonetic = parts[1].trim();
+                 const en = parts[2].trim();
+                 const sentence = parts[3].trim();
+                 dict[word] = {phonetic, en, sentence};
+                 words.push({word, phonetic, en, sentence});
              }
          }
-         document.getElementById('count').innerText =
-             `已导入 ${words.length} 个词汇`;
+         document.getElementById('count').innerText = `已导入 ${words.length} 个词汇`;
          renderTable(words);
      })
      .catch(err => {
-         document.getElementById('count').innerText =
-             '导入失败：请确认 dialect.csv 已上传到仓库（' + err + '）';
+         document.getElementById('count').innerText = '导入失败：检查dialect.csv是否上传';
      });
+ // 方言转英文核心查询函数
  function searchWord(){
      const input = document.getElementById('wordInput').value.trim();
      const res = document.getElementById('result');
      if(dict[input]){
-         res.innerText = `${input}：${dict[input]}`;
+         const item = dict[input];
+         res.innerText = `方言词【${input}】 → 英文翻译：${item.en}
+ 音标：${item.phonetic}，例句：${item.sentence}`;
      }else{
-         res.innerText = '暂无该词汇';
+         res.innerText = '词库暂无这个方言词汇';
      }
  }
+ //渲染4列表格
  function renderTable(data){
      const tb = document.getElementById('dictTable');
-     tb.innerHTML = `<tr><th>方言词</th><th>释义</th></tr>` +
-         data.map(d => `<tr><td>${d.word}</td><td>${d.mean}</td></tr>`).join('');
+     tb.innerHTML = `<tr><th>方言词</th><th>音标</th><th>英文翻译</th><th>例句</th></tr>` +
+         data.map(d => `<tr>
+             <td>${d.word}</td>
+             <td>${d.phonetic}</td>
+             <td>${d.en}</td>
+             <td>${d.sentence}</td>
+         </tr>`).join('');
  }
  </script>
  </body>
